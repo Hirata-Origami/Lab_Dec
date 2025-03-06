@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 5%;
+            background-color: #f0f0f0;
+        }
+
+        .search-form {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="submit"] {
+            padding: 8px 16px;
+            background-color: #4C56AF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #4d5497;
+        }
+
+        .results-table {
+            width: 80%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .results-table th {
+            background-color: #4C56AF;
+            color: white;
+        }
+
+        .results-table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .movie {
+            margin-top: 20px;
+            width: 80%;
+        }
+    </style>
+</head>
+<body>
+    <form action="/getMovie" method="POST" class="search-form">
+        <input type="text" name="search" placeholder="Enter the Movie Name">
+        <br>
+        <input type="submit" value="Search">
+    </form>
+
+    {% if data %}
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Release Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for movie in data %}
+                    <tr>
+                        <td>{{ movie.title }}</td>
+                        <td>{{ movie.release_date }}</td>
+                        <td>
+                            <form action="/getMovieDetails" method="POST">
+                                <input type="hidden" name="id" value="{{ movie.id }}">
+                                <input type="submit" value="View Details">
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if details %}
+        <div class="movie">
+            <h2>{{ details.title }}</h2>
+            <table class="results-table">
+                <tr>
+                    <th>Attribute</th>
+                    <th>Value</th>
+                </tr>
+                <tr><td>Title</td><td>{{ details.title }}</td></tr>
+                <tr><td>Release Date</td><td>{{ details.release_date }}</td></tr>
+                <tr><td>Overview</td><td>{{ details.overview }}</td></tr>
+                <tr><td>Popularity</td><td>{{ details.popularity }}</td></tr>
+                <tr><td>Vote Average</td><td>{{ details.vote_average }}</td></tr>
+            </table>
+        </div>
+    {% endif %}
+
+    {% if cast %}
+        <div class="movie">
+            <h2>Cast</h2>
+            <table class="results-table">
+                <tr>
+                    <th>Name</th>
+                    <th>Character</th>
+                    <th>Department</th>
+                </tr>
+                {% for member in cast.cast %}
+                    <tr>
+                        <td>{{ member.name }}</td>
+                        <td>{{ member.character }}</td>
+                        <td>{{ member.known_for_department }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+
+    {% if review %}
+        <div class="movie">
+            <h2>Reviews</h2>
+            <table class="results-table">
+                <tr>
+                    <th>Author</th>
+                    <th>Rating</th>
+                    <th>Content</th>
+                </tr>
+                {% for rev in review.results %}
+                    <tr>
+                        <td>{{ rev.author }}</td>
+                        <td>{{ rev.author_details.rating or 'N/A' }}</td>
+                        <td>{{ rev.content }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+
+    {% if similar %}
+        <div class="movie">
+            <h2>Similar Movies</h2>
+            <table class="results-table">
+                <tr>
+                    <th>Title</th>
+                    <th>Release Date</th>
+                    <th>Vote Average</th>
+                </tr>
+                {% for movie in similar.results %}
+                    <tr>
+                        <td>{{ movie.title }}</td>
+                        <td>{{ movie.release_date }}</td>
+                        <td>{{ movie.vote_average }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+</body>
+</html>
